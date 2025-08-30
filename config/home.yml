@@ -1,0 +1,311 @@
+- name: Home
+  # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
+  # hide-desktop-navigation: true
+  columns:
+    - size: small
+      widgets:
+        - type: calendar
+          first-day-of-week: monday
+
+        - type: custom-api
+          title: Tempo
+          template: |
+            {{ $today := newRequest "https://www.api-couleur-tempo.fr/api/jourTempo/today" | getResponse }}
+            {{ $tomorrow := newRequest "https://www.api-couleur-tempo.fr/api/jourTempo/tomorrow" | getResponse }}
+
+            {{ $todayEmojie := "" }}
+            {{ if eq ($today.JSON.String "libCouleur") "Bleu" }}
+              {{ $todayEmojie = "🔵" }}
+            {{ else if eq ($today.JSON.String "libCouleur") "Blanc" }}
+              {{ $todayEmojie = "⚪️" }}
+            {{ else if eq ($today.JSON.String "libCouleur") "Rouge" }}
+              {{ $todayEmojie = "🔴" }}
+            {{ end }}
+
+            {{ $tomorrowEmojie := "" }}
+            {{ if eq ($tomorrow.JSON.String "libCouleur") "Bleu" }}
+              {{ $tomorrowEmojie = "🔵" }}
+            {{ else if eq ($tomorrow.JSON.String "libCouleur") "Blanc" }}
+              {{ $tomorrowEmojie = "⚪️" }}
+            {{ else if eq ($tomorrow.JSON.String "libCouleur") "Rouge" }}
+              {{ $tomorrowEmojie = "🔴" }}
+            {{ end }}
+
+            <p>Demain: {{ $tomorrowEmojie }} {{ $tomorrow.JSON.String "libCouleur" }}</p>
+            <p>Aujourd'hui: {{ $todayEmojie }} {{ $today.JSON.String "libCouleur" }}</p>
+
+
+        - type: twitch-channels
+          channels:
+            - TheGreatReview
+            - WhataFail
+            - Micode
+            - Binogure
+            - DevBaudo
+
+    - size: full
+
+      widgets:
+
+        - type: search
+          search-engine: duckduckgo
+          new-tab: true
+          target: _blank
+          bangs:
+          - title: YouTube
+            shortcut: "!yt" 
+            url: https://www.youtube.com/results?search_query={QUERY}
+
+          - title: AI
+            shortcut: "!ai"  
+
+            url: https://www.perplexity.ai/search?q={QUERY}
+          
+
+            
+
+        - type: group
+          widgets:
+            - type: rss
+              title: Korben.info
+              style: detailed-list
+              limit: 10
+              collapse-after: 3
+              cache: 12h
+              feeds:
+                - url: https://korben.info/feed
+                  title: Korben
+            - type: rss
+              title: The Verge
+              style: detailed-list
+              limit: 10
+              collapse-after: 3
+              cache: 12h
+              feeds:
+                - url: https://www.theverge.com/rss/index.xml
+                  title: The Verge
+            
+            - type: rss
+              title: Mac4Ever
+              style: detailed-list
+              limit: 10
+              collapse-after: 3
+              cache: 12h
+              feeds:
+                - url: https://www.mac4ever.com/flux/rss/content/all
+                  title: Mac4Ever
+
+            - type: rss
+              title: Le Monde
+              style: detailed-list
+              limit: 10
+              collapse-after: 3
+              cache: 12h
+              feeds:
+                - url: https://www.lemonde.fr/rss/une.xml
+                  title: Le Monde
+
+                  
+
+        
+        
+
+        - type: videos
+          channels:
+            - UC4sEQXAfWhMBMHvvGnbJ84g # Hydrios
+            - UCXOSur_wiS9TK0WUhJrYrlA # Dammit Jeff
+            - UCnxEvD2eagj2VgtkFL5wDHA # V2F
+            - UCNiauGTV7XhkOpUAIXod4xA # Léo Duff
+            - UCRI5foOTNz6DuVz3SVQ1cMA # Tao Gassin
+
+        - type: custom-api
+          title: Epic Games
+          cache: 1h
+          url: https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr&country=FR&allowCountries=FR
+          template: |
+            <div>
+              {{ if eq .Response.StatusCode 200 }}
+                <div class="horizontal-cards-2">
+                  {{ range .JSON.Array "data.Catalog.searchStore.elements" }}
+                    {{ $price := .String "price.totalPrice.discountPrice" }}
+                    {{ $hasPromo := gt (len (.Array "promotions.promotionalOffers")) 0 }}
+                    {{ if and $hasPromo (eq $price "0") }}
+                      {{ $gamePage := .String "productSlug" }}
+                      {{ if gt (len (.Array "offerMappings")) 0 }}
+                        {{ $gamePage = .String "offerMappings.0.pageSlug" }}
+                      {{end }}
+                      <a href="https://store.epicgames.com/fr-FR/p/{{ $gamePage }}" target="_blank" class="card">
+                        {{ $title := .String "title" }}
+                        {{ range .Array "keyImages" }}
+                          {{ if eq (.String "type") "OfferImageWide" }}
+                            <img src="{{ .String "url" }}" alt="{{ $title }}" style="width: 100%; max-width: 300px; height: 150px; object-fit: cover; border-radius: var(--border-radius);">
+                          {{ end }}
+                        {{ end }}
+                        <div class="card-content">
+                          <span class="size-base color-primary">{{ $title }}</span><br>
+                          <span class="size-h5 color-subdue">
+                            {{ if $hasPromo }}
+                              {{ $promotions := .Array "promotions.promotionalOffers" }}
+                              {{ if gt (len $promotions) 0 }}
+                                {{ $firstPromo := index $promotions 0 }}
+                                {{ $offers := $firstPromo.Array "promotionalOffers" }}
+                                {{ if gt (len $offers) 0 }}
+                                  {{ $firstOffer := index $offers 0 }}
+                                  Free until {{ slice ($firstOffer.String "endDate") 0 10 }}
+                                {{ else }}
+                                  Free this week!
+                                {{ end }}
+                              {{ else }}
+                                Free this week!
+                              {{ end }}
+                            {{ end }}
+                          </span>
+                        </div>
+                      </a>
+                    {{ end }}
+                  {{ end }}
+                </div>
+              {{ else }}
+                <p class="color-negative">Error fetching Epic Games data.</p>
+              {{ end }}
+            </div>
+
+
+
+
+          
+
+    - size: small
+      widgets:
+        - type: weather
+          location: Savigny-le-Temple, France
+          units: metric # alternatively "imperial"
+          hour-format: 12h # alternatively "24h"
+          # Optionally hide the location from being displayed in the widget
+          # hide-location: true
+
+        - type: group
+          widgets:
+            - type: custom-api
+              title: Day
+              body-type: string
+              skip-json-validation: true
+              cache: 1s
+              template: |
+                {{ $localTime := now }}
+                {{ $secondsPerDay := 86400 }}
+                {{ $elapsedSeconds := add (mul $localTime.Hour 3600) (mul $localTime.Minute 60) | add $localTime.Second }}
+                {{ $dayProgress := div (mul $elapsedSeconds 100.0) $secondsPerDay }}
+
+                {{ $gradient := "" }}
+                {{ if lt $dayProgress 10.0 }}
+                  {{ $gradient = "#70a1ff" }}
+                {{ else if lt $dayProgress 25.0 }}
+                  {{ $gradient = "#ff6b6b, #70a1ff" }}
+                {{ else if lt $dayProgress 50.0 }}
+                  {{ $gradient = "#ff6b6b, #f8e71c, #7ed6df" }}
+                {{ else }}
+                  {{ $gradient = "#ff6b6b, #f8e71c, #7ed6df, #70a1ff" }}
+                {{ end }}
+
+                <div style="font-family: sans-serif; text-align: center;">
+                  <div style="width: 100%; height: 12px; background: #23262F; border:1px solid gray; border-radius: 10px; overflow: hidden;">
+                    <div style="
+                      height: 100%;
+                      width: {{ $dayProgress }}%;
+                      background: linear-gradient(90deg, {{ $gradient }});
+                    "></div>
+                  </div>
+                  <div class="size-h1" style="margin-top: 6px;">{{ printf "%.2f" $dayProgress }}% of the day has passed</div>
+                </div>
+            - type: custom-api
+              title: Month
+              body-type: string
+              skip-json-validation: true
+              cache: 1s
+              template: |
+                {{ $localTime := now }}
+
+                {{ $month := $localTime.Month }}
+                {{ $dayOfMonth := $localTime.Day }}
+
+                {{ $secondsToday := add (mul $localTime.Hour 3600) (mul $localTime.Minute 60) | add $localTime.Second }}
+                {{ $fractionOfDay := div $secondsToday 86400.0 }}
+
+                {{ $daysInMonth := 31 }}
+                {{ if eq $month 2 }} {{ $daysInMonth = 28 }} {{ end }}
+                {{ if or (eq $month 4) (eq $month 6) (eq $month 9) (eq $month 11) }} {{ $daysInMonth = 30 }} {{ end }}
+
+                {{ $daysElapsed := add (sub $dayOfMonth 1) $fractionOfDay }}
+                {{ $monthProgress := mul (div $daysElapsed $daysInMonth) 100.0 }}
+
+                {{ $gradient := "" }}
+                {{ if lt $monthProgress 10.0 }}
+                  {{ $gradient = "#70a1ff" }}
+                {{ else if lt $monthProgress 25.0 }}
+                  {{ $gradient = "#ff6b6b, #70a1ff" }}
+                {{ else if lt $monthProgress 50.0 }}
+                  {{ $gradient = "#ff6b6b, #f8e71c, #7ed6df" }}
+                {{ else }}
+                  {{ $gradient = "#ff6b6b, #f8e71c, #7ed6df, #70a1ff" }}
+                {{ end }}
+
+                <div style="font-family: sans-serif; text-align: center;">
+                  <div style="width: 100%; height: 12px; background: #23262F; border:1px solid gray; border-radius: 10px; overflow: hidden;">
+                    <div style="
+                      height: 100%;
+                      width: {{ $monthProgress }}%;
+                      background: linear-gradient(90deg, {{ $gradient }});
+                    "></div>
+                  </div>
+                  <div class="size-h1" style="margin-top: 6px;">{{ printf "%.2f" $monthProgress }}% of the month has passed</div>
+                </div>
+            - type: custom-api
+              title: Year
+              body-type: string
+              skip-json-validation: true
+              cache: 1s
+              template: |
+                {{ $localTime := now }}
+                
+                {{ $secondsToday := add (mul $localTime.Hour 3600) (mul $localTime.Minute 60) | add $localTime.Second }}
+                {{ $dayOfYear := $localTime.YearDay }}
+                {{ $secondsElapsed := add (mul (sub $dayOfYear 1) 86400) $secondsToday }}
+
+                {{ $totalSecondsInYear := mul 365 86400 }}
+                {{ $yearProgress := div (mul $secondsElapsed 100.0) $totalSecondsInYear }}
+
+                {{ $gradient := "" }}
+                {{ if lt $yearProgress 10.0 }}
+                  {{ $gradient = "#70a1ff" }}
+                {{ else if lt $yearProgress 25.0 }}
+                  {{ $gradient = "#ff6b6b, #70a1ff" }}
+                {{ else if lt $yearProgress 50.0 }}
+                  {{ $gradient = "#ff6b6b, #f8e71c, #7ed6df" }}
+                {{ else }}
+                  {{ $gradient = "#ff6b6b, #f8e71c, #7ed6df, #70a1ff" }}
+                {{ end }}
+
+                <div style="font-family: sans-serif; text-align: center;">
+                  <div style="width: 100%; height: 12px; background: #23262F; border:1px solid gray; border-radius: 10px; overflow: hidden;">
+                    <div style="
+                      height: 100%;
+                      width: {{ $yearProgress }}%;
+                      background: linear-gradient(90deg, {{ $gradient }});
+                    "></div>
+                  </div>
+                  <div class="size-h1" style="margin-top: 6px;">{{ printf "%.2f" $yearProgress }}% of the year has passed</div>
+                </div>
+
+        - type: markets
+          markets:
+            - symbol: ^FCHI
+              name: CAC 40
+            - symbol: BTC-EUR
+              name: Bitcoin
+            - symbol: NVDA
+              name: NVIDIA
+            - symbol: AAPL
+              name: Apple
+            - symbol: MSFT
+              name: Microsoft
