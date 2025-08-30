@@ -54,6 +54,3 @@ Il centralise différentes informations utiles au quotidien : actualités, mét�
 (0). Télécharger Docker
 1. Télécharger le repo: `git clone https://github.com/squach90/GlanceNewTabs.git`
 2. Faire un: `docker compose up -d`
-
-```bash
-~/.config/glance/config.yaml
