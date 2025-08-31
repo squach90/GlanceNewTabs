@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "GlanceNewTabs",
+  "version": "1.0",
+  "incognito": "split",
+  "description": "Use Glance in a new tabs instead of default New Tabs Page",
+  "chrome_url_overrides": {
+    "newtab": "newTabOverride.html"
+  }
+}
