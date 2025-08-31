@@ -1,47 +1,60 @@
-- name: Home
+- name: Deals
   # Optionally, if you only have a single page you can hide the desktop navigation for a cleaner look
   # hide-desktop-navigation: true
   columns:
     - size: small
       widgets:
-        - type: calendar
-          first-day-of-week: monday
-
         - type: custom-api
-          title: Tempo
+          title: Epic Games
+          cache: 1h
+          url: https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr&country=FR&allowCountries=FR
           template: |
-            {{ $today := newRequest "https://www.api-couleur-tempo.fr/api/jourTempo/today" | getResponse }}
-            {{ $tomorrow := newRequest "https://www.api-couleur-tempo.fr/api/jourTempo/tomorrow" | getResponse }}
-
-            {{ $todayEmojie := "" }}
-            {{ if eq ($today.JSON.String "libCouleur") "Bleu" }}
-              {{ $todayEmojie = "🔵" }}
-            {{ else if eq ($today.JSON.String "libCouleur") "Blanc" }}
-              {{ $todayEmojie = "⚪️" }}
-            {{ else if eq ($today.JSON.String "libCouleur") "Rouge" }}
-              {{ $todayEmojie = "🔴" }}
-            {{ end }}
-
-            {{ $tomorrowEmojie := "" }}
-            {{ if eq ($tomorrow.JSON.String "libCouleur") "Bleu" }}
-              {{ $tomorrowEmojie = "🔵" }}
-            {{ else if eq ($tomorrow.JSON.String "libCouleur") "Blanc" }}
-              {{ $tomorrowEmojie = "⚪️" }}
-            {{ else if eq ($tomorrow.JSON.String "libCouleur") "Rouge" }}
-              {{ $tomorrowEmojie = "🔴" }}
-            {{ end }}
-
-            <p>Demain: {{ $tomorrowEmojie }} {{ $tomorrow.JSON.String "libCouleur" }}</p>
-            <p>Aujourd'hui: {{ $todayEmojie }} {{ $today.JSON.String "libCouleur" }}</p>
-
-
-        - type: twitch-channels
-          channels:
-            - TheGreatReview
-            - WhataFail
-            - Micode
-            - Binogure
-            - DevBaudo
+            <div>
+              {{ if eq .Response.StatusCode 200 }}
+                <div class="horizontal-cards-2">
+                  {{ range .JSON.Array "data.Catalog.searchStore.elements" }}
+                    {{ $price := .String "price.totalPrice.discountPrice" }}
+                    {{ $hasPromo := gt (len (.Array "promotions.promotionalOffers")) 0 }}
+                    {{ if and $hasPromo (eq $price "0") }}
+                      {{ $gamePage := .String "productSlug" }}
+                      {{ if gt (len (.Array "offerMappings")) 0 }}
+                        {{ $gamePage = .String "offerMappings.0.pageSlug" }}
+                      {{end }}
+                      <a href="https://store.epicgames.com/fr-FR/p/{{ $gamePage }}" target="_blank" class="card">
+                        {{ $title := .String "title" }}
+                        {{ range .Array "keyImages" }}
+                          {{ if eq (.String "type") "OfferImageWide" }}
+                            <img src="{{ .String "url" }}" alt="{{ $title }}" style="width: 100%; max-width: 300px; height: 150px; object-fit: cover; border-radius: var(--border-radius);">
+                          {{ end }}
+                        {{ end }}
+                        <div class="card-content">
+                          <span class="size-base color-primary">{{ $title }}</span><br>
+                          <span class="size-h5 color-subdue">
+                            {{ if $hasPromo }}
+                              {{ $promotions := .Array "promotions.promotionalOffers" }}
+                              {{ if gt (len $promotions) 0 }}
+                                {{ $firstPromo := index $promotions 0 }}
+                                {{ $offers := $firstPromo.Array "promotionalOffers" }}
+                                {{ if gt (len $offers) 0 }}
+                                  {{ $firstOffer := index $offers 0 }}
+                                  Free until {{ slice ($firstOffer.String "endDate") 0 10 }}
+                                {{ else }}
+                                  Free this week!
+                                {{ end }}
+                              {{ else }}
+                                Free this week!
+                              {{ end }}
+                            {{ end }}
+                          </span>
+                        </div>
+                      </a>
+                    {{ end }}
+                  {{ end }}
+                </div>
+              {{ else }}
+                <p class="color-negative">Error fetching Epic Games data.</p>
+              {{ end }}
+            </div>
 
     - size: full
 
@@ -52,14 +65,13 @@
           new-tab: true
           target: _blank
           bangs:
-          - title: YouTube
-            shortcut: "!yt" 
-            url: https://www.youtube.com/results?search_query={QUERY}
+          - title: Dealabs
+            shortcut: "!dl" 
+            url: https://www.dealabs.com/search?q={QUERY}
 
-          - title: AI
-            shortcut: "!ai"  
-
-            url: https://www.perplexity.ai/search?q={QUERY}
+          - title: GG.Deals
+            shortcut: "!gg"
+            url: https://gg.deals/search/?title={QUERY}
           
         - type: clock
           hour-format: 24h
@@ -72,63 +84,33 @@
         - type: group
           widgets:
             - type: rss
-              title: Korben.info
+              title: Steam (Dealabs)
               style: horizontal-cards
               limit: 10
               collapse-after: 3
               cache: 12h
               feeds:
-                - url: https://korben.info/feed
-                  title: Korben
+                - url: https://rss.app/feeds/ewYNRCUDtnJh9UP5.xml
+                  title: Steam
             - type: rss
-              title: The Verge
+              title: Jeux-Vidéo (Dealabs)
               style: horizontal-cards
               limit: 10
               collapse-after: 3
               cache: 12h
               feeds:
-                - url: https://www.theverge.com/rss/index.xml
-                  title: The Verge
+                - url: https://www.dealabs.com/rss/groupe/jeux-video
+                  title: Jeux-Vidéo
             
             - type: rss
-              title: Mac4Ever
+              title: GG.Deals
               style: horizontal-cards
               limit: 10
               collapse-after: 3
               cache: 12h
               feeds:
-                - url: https://www.mac4ever.com/flux/rss/content/all
-                  title: Mac4Ever
-
-            - type: rss
-              title: Le Monde
-              style: horizontal-cards
-              limit: 10
-              collapse-after: 3
-              cache: 12h
-              feeds:
-                - url: https://www.lemonde.fr/rss/une.xml
-                  title: Le Monde
-
-                  
-
-        
-        
-
-        - type: videos
-          channels:
-            - UC4sEQXAfWhMBMHvvGnbJ84g # Hydrios
-            - UCXOSur_wiS9TK0WUhJrYrlA # Dammit Jeff
-            - UCnxEvD2eagj2VgtkFL5wDHA # V2F
-            - UCNiauGTV7XhkOpUAIXod4xA # Léo Duff
-            - UCRI5foOTNz6DuVz3SVQ1cMA # Tao Gassin
-
-        
-
-
-
-
-          
+                - url: https://rss.app/feeds/slxWzY0F3geItn0e.xml
+                  title: GG.Deals
 
     - size: small
       widgets:
@@ -252,57 +234,7 @@
                   <div class="size-h1" style="margin-top: 6px;">{{ printf "%.2f" $yearProgress }}% of the year has passed</div>
                 </div>
 
-        - type: custom-api
-          title: Epic Games
-          cache: 1h
-          url: https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr&country=FR&allowCountries=FR
-          template: |
-            <div>
-              {{ if eq .Response.StatusCode 200 }}
-                <div class="horizontal-cards-2">
-                  {{ range .JSON.Array "data.Catalog.searchStore.elements" }}
-                    {{ $price := .String "price.totalPrice.discountPrice" }}
-                    {{ $hasPromo := gt (len (.Array "promotions.promotionalOffers")) 0 }}
-                    {{ if and $hasPromo (eq $price "0") }}
-                      {{ $gamePage := .String "productSlug" }}
-                      {{ if gt (len (.Array "offerMappings")) 0 }}
-                        {{ $gamePage = .String "offerMappings.0.pageSlug" }}
-                      {{end }}
-                      <a href="https://store.epicgames.com/fr-FR/p/{{ $gamePage }}" target="_blank" class="card">
-                        {{ $title := .String "title" }}
-                        {{ range .Array "keyImages" }}
-                          {{ if eq (.String "type") "OfferImageWide" }}
-                            <img src="{{ .String "url" }}" alt="{{ $title }}" style="width: 100%; max-width: 300px; height: 150px; object-fit: cover; border-radius: var(--border-radius);">
-                          {{ end }}
-                        {{ end }}
-                        <div class="card-content">
-                          <span class="size-base color-primary">{{ $title }}</span><br>
-                          <span class="size-h5 color-subdue">
-                            {{ if $hasPromo }}
-                              {{ $promotions := .Array "promotions.promotionalOffers" }}
-                              {{ if gt (len $promotions) 0 }}
-                                {{ $firstPromo := index $promotions 0 }}
-                                {{ $offers := $firstPromo.Array "promotionalOffers" }}
-                                {{ if gt (len $offers) 0 }}
-                                  {{ $firstOffer := index $offers 0 }}
-                                  Free until {{ slice ($firstOffer.String "endDate") 0 10 }}
-                                {{ else }}
-                                  Free this week!
-                                {{ end }}
-                              {{ else }}
-                                Free this week!
-                              {{ end }}
-                            {{ end }}
-                          </span>
-                        </div>
-                      </a>
-                    {{ end }}
-                  {{ end }}
-                </div>
-              {{ else }}
-                <p class="color-negative">Error fetching Epic Games data.</p>
-              {{ end }}
-            </div>
+        
 
 
         - type: markets
