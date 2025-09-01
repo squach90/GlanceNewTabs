@@ -56,11 +56,22 @@
             shortcut: "!yt" 
             url: https://www.youtube.com/results?search_query={QUERY}
 
-          - title: AI
+          - title: ChatGPT
             shortcut: "!ai"  
+            url: https://chatgpt.com/?q={QUERY}
 
+          - title: Perplexity
+            shortcut: "!pr"  
             url: https://www.perplexity.ai/search?q={QUERY}
-          
+
+          - title: Mistral
+            shortcut: "!ms"  
+            url: https://chat.mistral.ai/chat?q={QUERY}
+
+          - title: Claude
+            shortcut: "!cl"  
+            url: https://claude.ai/new?q={QUERY}
+
         - type: clock
           hour-format: 24h
           timezones:
