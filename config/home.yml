@@ -320,14 +320,19 @@
           markets:
             - symbol: ^FCHI
               name: CAC 40
+              symbol-link: https://fr.finance.yahoo.com/quote/%5EFCHI/
             - symbol: BTC-EUR
               name: Bitcoin
+              symbol-link: https://fr.finance.yahoo.com/quote/BTC-EUR/
             - symbol: NVDA
               name: NVIDIA
+              symbol-link: https://fr.finance.yahoo.com/quote/NVDA/
             - symbol: AAPL
               name: Apple
+              symbol-link: https://fr.finance.yahoo.com/quote/AAPL/
             - symbol: MSFT
               name: Microsoft
+              symbol-link: https://fr.finance.yahoo.com/quote/MSFT/
 
 
         
