@@ -265,7 +265,7 @@
 
         - type: custom-api
           title: Epic Games
-          cache: 1h
+          cache: 4h
           url: https://store-site-backend-static.ak.epicgames.com/freeGamesPromotions?locale=fr&country=FR&allowCountries=FR
           template: |
             <div>
