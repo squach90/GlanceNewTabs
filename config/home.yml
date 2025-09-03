@@ -87,7 +87,7 @@
               style: horizontal-cards
               limit: 10
               collapse-after: 3
-              cache: 12h
+              cache: 6h
               feeds:
                 - url: https://korben.info/feed
                   title: Korben
@@ -96,7 +96,7 @@
               style: horizontal-cards
               limit: 10
               collapse-after: 3
-              cache: 12h
+              cache: 6h
               feeds:
                 - url: https://www.theverge.com/rss/index.xml
                   title: The Verge
@@ -106,7 +106,7 @@
               style: horizontal-cards
               limit: 10
               collapse-after: 3
-              cache: 12h
+              cache: 6h
               feeds:
                 - url: https://www.mac4ever.com/flux/rss/content/all
                   title: Mac4Ever
@@ -116,7 +116,7 @@
               style: horizontal-cards
               limit: 10
               collapse-after: 3
-              cache: 12h
+              cache: 6h
               feeds:
                 - url: https://www.lemonde.fr/rss/une.xml
                   title: Le Monde
