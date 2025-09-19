@@ -91,6 +91,17 @@
               feeds:
                 - url: https://korben.info/feed
                   title: Korben
+            
+            - type: rss
+              title: Fin du Game
+              style: horizontal-cards
+              limit: 10
+              collapse-after: 3
+              cache: 12h
+              feeds:
+                - url: https://feeds.acast.com/public/shows/fin-du-game
+                  title: FinDuGame
+            
             - type: rss
               title: The Verge
               style: horizontal-cards
@@ -110,16 +121,6 @@
               feeds:
                 - url: https://www.mac4ever.com/flux/rss/content/all
                   title: Mac4Ever
-            
-            - type: rss
-              title: Fin du Game
-              style: horizontal-cards
-              limit: 10
-              collapse-after: 3
-              cache: 12h
-              feeds:
-                - url: https://feeds.acast.com/public/shows/fin-du-game
-                  title: FinDuGame
 
             - type: rss
               title: Le Monde
