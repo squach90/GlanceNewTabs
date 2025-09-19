@@ -110,6 +110,16 @@
               feeds:
                 - url: https://www.mac4ever.com/flux/rss/content/all
                   title: Mac4Ever
+            
+            - type: rss
+              title: Fin du Game
+              style: horizontal-cards
+              limit: 10
+              collapse-after: 3
+              cache: 12h
+              feeds:
+                - url: https://feeds.acast.com/public/shows/fin-du-game
+                  title: FinDuGame
 
             - type: rss
               title: Le Monde
@@ -121,11 +131,6 @@
                 - url: https://www.lemonde.fr/rss/une.xml
                   title: Le Monde
 
-                  
-
-        
-        
-
         - type: videos
           channels:
             - UC4sEQXAfWhMBMHvvGnbJ84g # Hydrios
@@ -133,13 +138,6 @@
             - UCnxEvD2eagj2VgtkFL5wDHA # V2F
             - UCNiauGTV7XhkOpUAIXod4xA # Léo Duff
             - UCRI5foOTNz6DuVz3SVQ1cMA # Tao Gassin
-
-        
-
-
-
-
-          
 
     - size: small
       widgets:
